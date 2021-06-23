@@ -67,35 +67,7 @@ def convert_anns(coco, image, catIds):
     return
 
 
-def main():
-    bc = bcolors
-    folder = 'downloaded_images'
-    lfolder = 'labels'
-
-    if (os.path.exists('./' + folder)):
-        shutil.rmtree('./' + folder)
-
-    if (os.path.exists('./' + lfolder)):
-        shutil.rmtree('./' + lfolder)
-    
-    os.mkdir('./' + folder)
-    os.mkdir('./' + lfolder)
-
-    # Download instances_train2017.json from the COCO website and put in the same directory as this script
-    coco = COCO('instances_train2017.json')
-    cats = coco.loadCats(coco.getCatIds())
-    nms = [cat['name'] for cat in cats]
-    print('COCO categories: \n{}\n'.format(' '.join(nms)))
-
-
-    # Replace category with whatever is of interest to you
-    cat = ['person', 'sports ball']
-    catIds = coco.getCatIds(catNms=cat)
-    imgIds = coco.getImgIds(catIds=catIds)
-    images = coco.loadImgs(imgIds)
-
-    # Create a subfolder in this directory called "downloaded_images". This is where your images will be downloaded into.
-    # Comment this entire section out if you don't want to download the images
+def download_images(bc, folder, images):
     threads = 20
     pool = ThreadPool(threads)
     if len(images) > 0:
@@ -113,6 +85,42 @@ def main():
         pool.join()
     else:
         print(bc.INFO + 'All images already downloaded.' + bc.ENDC)
+    return
+
+
+def getAnnJSON():
+
+    return
+
+
+
+def main():
+    bc = bcolors
+    folder = 'images'
+    lfolder = 'labels'
+
+    # Create images and labels folder. Delete old files if needed 
+    if (os.path.exists('./' + folder)):
+        shutil.rmtree('./' + folder)
+    if (os.path.exists('./' + lfolder)):
+        shutil.rmtree('./' + lfolder)
+    os.mkdir('./' + folder)
+    os.mkdir('./' + lfolder)
+
+    # Download instances_train2017.json from the COCO website and put in the same directory as this script
+    coco = COCO('instances_train2017.json')
+    cats = coco.loadCats(coco.getCatIds())
+    nms = [cat['name'] for cat in cats]
+    print('COCO categories: \n{}\n'.format(' '.join(nms)))
+
+
+    # Replace category with whatever is of interest to you
+    cat = ['person', 'sports ball']
+    catIds = coco.getCatIds(catNms=cat)
+    imgIds = coco.getImgIds(catIds=catIds)
+    images = coco.loadImgs(imgIds)
+
+    download_images(bc, folder, images)
 
 
     # Create a subfolder in this directory called "labels". This is where the annotations will be saved in YOLO format
@@ -127,6 +135,8 @@ def main():
         thread.join()
 
     return
+
+
 
 
 if __name__ == '__main__':
